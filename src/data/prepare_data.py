@@ -4,6 +4,7 @@
 
 import pandas as pd
 import numpy as np
+from src.utils.time_utils import minutes_of_year_to_datetime
 
 def add_time_features(df : pd.DataFrame) -> pd.DataFrame:
     """
@@ -23,6 +24,7 @@ def add_time_features(df : pd.DataFrame) -> pd.DataFrame:
     df['cos_minutes_of_day'] = np.cos(2 * np.pi * minutes_of_day / (24 * 60))
     df['sin_day_of_year'] = np.sin(2 * np.pi * day_of_year / 365)
     df['cos_day_of_year'] = np.cos(2 * np.pi * day_of_year / 365)
+    df['date_time'] = df['time'].apply(lambda x: minutes_of_year_to_datetime(x)) # Used in cumulative features
     df.drop(columns=['time'], inplace=True)
     return df
 
@@ -71,5 +73,20 @@ def add_lagged_features(df : pd.DataFrame, lag: int = 1) -> pd.DataFrame:
 
     df['lagged_indoor_temp'] = df['indoor-temp'].shift(lag)
     df['lagged_outdoor_temp'] = df['outdoor-temp'].shift(lag)
-    df['lagged_temp_diff'] = df['temp_diff'].shift(lag)
+    # df['lagged_temp_diff'] = df['temp_diff'].shift(lag)
+    # df['lagged_window_open'] = df['window-open'].shift(lag)
+    return df
+
+def add_cumulative_features(df : pd.DataFrame) -> pd.DataFrame:
+    """
+    Adds cumulative features (over the course of a rolling 24 hour period) to the dataframe.
+    The cumulative features are the cumulative sum of 'temp_diff', time window has been open, time window has been closed, and times window has been opened / closed.
+    """
+
+    if 'cumulative_indoor_temp' in df.columns and 'cumulative_outdoor_temp' in df.columns and 'cumulative_temp_diff' in df.columns:
+        return df
+    if 'indoor-temp' not in df.columns or 'outdoor-temp' not in df.columns or 'temp_diff' not in df.columns:
+        raise ValueError("The DataFrame does not contain 'indoor-temp', 'outdoor-temp', or 'temp_diff' columns.")
+
+    # TODO:: Create cumulative features with rolling window of 24 hours (use time util)
     return df
