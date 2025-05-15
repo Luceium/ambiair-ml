@@ -104,6 +104,6 @@ def extract_features(df : pd.DataFrame) -> pd.DataFrame:
     df = add_cumulative_features(df)
 
     # Drop temporary columns
-    df.drop(['date_time'], inplace=True, axis=1)
+    # df.drop(['date_time'], inplace=True, axis=1)
     
     return df
