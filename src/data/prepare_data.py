@@ -90,3 +90,20 @@ def add_cumulative_features(df : pd.DataFrame) -> pd.DataFrame:
 
     # TODO:: Create cumulative features with rolling window of 24 hours (use time util)
     return df
+
+def extract_features(df : pd.DataFrame) -> pd.DataFrame:
+    """
+    Extracts features from the dataframe.
+    The features are the time features, temperature difference, rolling features, lagged features, and cumulative features.
+    """
+
+    df = add_time_features(df)
+    df = add_temp_diff(df)
+    df = add_rolling_features(df)
+    df = add_lagged_features(df)
+    df = add_cumulative_features(df)
+
+    # Drop temporary columns
+    df.drop(['date_time'], inplace=True, axis=1)
+    
+    return df
